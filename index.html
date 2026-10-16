@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuiz Interaktif Sejarah Tingkatan 2 (Bab 4-8)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Glowing background elements (Emerald Theme) -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-10 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md px-6 py-4">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20">📜</span>
+                <h1 class="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Sejarah Tingkatan 2</h1>
+            </div>
+            <span class="text-xs px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-emerald-400 font-medium">Bab 4 - Bab 8</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="relative z-10 container mx-auto px-4 py-8 max-w-xl flex-grow flex items-center justify-center">
+
+        <!-- 1. Registration Screen -->
+        <div id="screen-register" class="w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/50 animate-fade-in">
+            <div class="text-center mb-8">
+                <div class="inline-flex p-3 rounded-2xl bg-emerald-500/10 text-emerald-400 mb-3 border border-emerald-500/20 text-2xl">⚡</div>
+                <h2 class="text-2xl font-extrabold tracking-tight text-white">Cabaran Minda Sejarah</h2>
+                <p class="text-xs text-slate-400 mt-1.5">Soalan muncul satu persatu. Jawab dengan pantas dan catat nama anda di papan kedudukan!</p>
+            </div>
+            <form id="form-register" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Nama Anda</label>
+                    <input type="text" id="username" required placeholder="Cth: Qhalif Iskandar" class="w-full px-4 py-3.5 rounded-xl bg-slate-950/80 border border-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm transition text-white placeholder-slate-600">
+                </div>
+                <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-[0.98] transition-all">
+                    Mula Cabaran 🚀
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-slate-800/80">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Papan Pendahulu Terkini</h3>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="System Ready"></span>
+                </div>
+                <div id="mini-leaderboard" class="space-y-2 text-xs">
+                    <!-- Populated dynamically (Empty initially) -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Quiz Screen (One by One) -->
+        <div id="screen-quiz" class="hidden w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/50 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-2">
+                    <span id="question-tracker" class="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">Soalan 1 / 20</span>
+                </div>
+                <div id="timer-display" class="text-xs font-mono font-bold text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700/60">00:00</div>
+            </div>
+
+            <!-- Progress bar modern -->
+            <div class="w-full bg-slate-800 h-1.5 rounded-full mb-6 overflow-hidden">
+                <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full w-[5%] transition-all duration-300"></div>
+            </div>
+
+            <div class="mb-6">
+                <h3 id="question-text" class="text-base sm:text-lg font-bold text-white leading-relaxed"></h3>
+            </div>
+
+            <div id="options-container" class="space-y-3 mb-6">
+                <!-- Options injected dynamically -->
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800/80">
+                <button id="btn-hint" class="text-xs text-emerald-400/90 hover:text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-2 rounded-xl font-medium transition flex items-center gap-1.5">💡 Petunjuk</button>
+                <button id="btn-next" class="hidden px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 hover:brightness-110 transition flex items-center gap-1">Seterusnya ➔</button>
+            </div>
+            <div id="hint-box" class="hidden mt-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-300/90 italic"></div>
+        </div>
+
+        <!-- 3. Result Screen -->
+        <div id="screen-result" class="hidden w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/50 text-center animate-fade-in">
+            <div class="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-teal-500 text-slate-950 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-xl shadow-emerald-500/20">🏆</div>
+            <h2 class="text-2xl font-extrabold text-white">Tahniah!</h2>
+            <p id="result-user-info" class="text-xs text-slate-400 mt-1"></p>
+
+            <div class="my-6 p-6 rounded-2xl bg-slate-950/80 border border-slate-800/80">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Skor Akhir Anda</span>
+                <h1 id="final-score" class="text-4xl font-extrabold text-white my-1">0 / 20</h1>
+                <p id="result-remark" class="text-xs font-medium text-slate-300 mt-2"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button id="btn-review" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition border border-slate-700/80">
+                    🔍 Semak & Pembetulan
+                </button>
+                <button id="btn-leaderboard-view" class="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 hover:brightness-110 transition">
+                    📊 Kedudukan Online
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. Review Screen -->
+        <div id="screen-review" class="hidden w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl shadow-black/50 max-h-[80vh] flex flex-col animate-fade-in">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+                <h2 class="text-base font-bold text-white">Semakan & Pembetulan</h2>
+                <button id="btn-back-to-result" class="text-xs text-slate-400 hover:text-white font-semibold">Tutup ✕</button>
+            </div>
+            <div id="review-container" class="space-y-3 overflow-y-auto pr-2 flex-grow text-left">
+                <!-- Detailed reviews inserted here -->
+            </div>
+        </div>
+
+        <!-- 5. Full Leaderboard Screen -->
+        <div id="screen-leaderboard" class="hidden w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl shadow-black/50 animate-fade-in">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+                <h2 class="text-base font-bold text-white">🏆 Papan Pendahulu Global</h2>
+                <button id="btn-close-leaderboard" class="text-xs text-slate-400 hover:text-white font-semibold">Kembali ✕</button>
+            </div>
+            <div id="full-leaderboard-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-2 mb-6 text-left">
+                <!-- Leaderboard rows -->
+            </div>
+            <button id="btn-restart" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 hover:brightness-110 transition">
+                Cuba Semula 🔄
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 text-center py-4 text-[11px] text-slate-500 border-t border-slate-900">
+        Modul Interaktif Sejarah Tingkatan 2 &bull; Edisi Hijau Moden 2026
+    </footer>
+
+    <!-- Script Logik Kuiz -->
+    <script>
+        const masterQuestionPool = [
+            { question: "Apakah maksud amalan 'Animisme' dalam kepercayaan masyarakat awal di Malaysia?", options: ["Percaya bahawa setiap benda mempunyai semangat", "Percaya kepada kuasa ghaib yang disebut mana", "Menyembah matahari, bulan dan bumi", "Mengamalkan ajaran Hindu secara mutlak"], correct: 0, hint: "Ia berkaitan dengan kepercayaan terhadap roh atau semangat pada alam sekeliling.", rationale: "Animisme ialah kepercayaan bahawa setiap benda seperti pokok, batu, dan sungai mempunyai semangat atau roh." },
+            { question: "Apakah perbezaan utama antara Adat Perpatih dengan Adat Temenggung?", options: ["Adat Perpatih mengamalkan jurai keturunan ibu, manakala Adat Temenggung mengamalkan jurai keturunan bapa", "Adat Perpatih diamalkan di Johor, manakala Adat Temenggung di Negeri Sembilan", "Adat Perpatih melarang perpecahan tanah, manakala Adat Temenggung mengharamkan perkahwinan sesuku", "Tiada perbezaan ketara antara kedua-dua adat tersebut"], correct: 0, hint: "Fikirkan tentang sistem nasab atau jurai keturunan (matrilinear vs patrilinear).", rationale: "Adat Perpatih mengutamakan jurai keturunan ibu (matrilinear) manakala Adat Temenggung mengamalkan sistem patrilinear." },
+            { question: "Kerajaan awal manakah yang terkenal dengan pengaruh Hindu-Buddha di Lembah Bujang?", options: ["Kedah Tua", "Melaka", "Johor Riau", "Selangor"], correct: 0, hint: "Pusat arkeologi Hindu-Buddha terawal di Semenanjung Tanah Melayu terletak di utara.", rationale: "Kedah Tua (Langkasuka/Bujang Valley) merupakan pusat perdagangan dan tamadun awal Hindu-Buddha yang penting." },
+            { question: "Apakah sistem pemerintahan yang diamalkan di bawah pengaruh Hindu-Buddha di Nusantara?", options: ["Sistem Dewa-Raja", "Sistem Demokrasi Berparlimen", "Sistem Republik", "Sistem Kedaulatan Rakyat"], correct: 0, hint: "Raja dianggap sebagai wakil tuhan di muka bumi.", rationale: "Konsep Dewa-Raja meletakkan kedudukan raja di tempat yang tinggi dan dianggap suci." },
+            { question: "Siapakah pengasas Kesultanan Melayu Melaka?", options: ["Parameswara", "Sultan Mansur Shah", "Tun Perak", "Bendahara Tun Perpateh Tajah"], correct: 0, hint: "Baginda berasal dari Palembang dan memilih Melaka kerana kedudukannya yang strategik.", rationale: "Parameswara mengasaskan Melaka sekitar tahun 1400 selepas melarikan diri dari Temasek dan Palembang." },
+            { question: "Apakah faktor utama kejayaan Melaka sebagai pusat perdagangan antarabangsa?", options: ["Kedudukan geografi yang strategik di laluan Selat Melaka dan terlindung daripada angin monsun", "Penggunaan mata wang emas sepenuhnya dari Eropah", "Dasar menutup pintu kepada pedagang asing", "Kekuatan tentera laut British"], correct: 0, hint: "Perhatikan faktor tiupan angin monsun timur laut dan barat daya.", rationale: "Lokasi Melaka yang strategik di tengah-tengah laluan perdagangan Timur dan Barat menjadikannya tumpuan utama." },
+            { question: "Apakah peranan penting jawatan 'Syahbandar' di pelabuhan Melaka?", options: ["Menguruskan hal ehwal perdagangan dan pedagang asing di pelabuhan", "Menjadi panglima tentera darat Melaka", "Menjaga keselamatan peribadi Sultan Melaka", "Menulis karya sastera agung kerajaan"], correct: 0, hint: "Mereka bertindak sebagai pegawai pelabuhan yang menjaga kebajikan pedagang pelbagai bangsa.", rationale: "Syahbandar bertanggungjawab melicinkan urusan perdagangan, kutipan cukai pelabuhan, dan menjaga pedagang." },
+            { question: "Tahun berapakah Melaka tewas di tangan serangan Portugis di bawah pimpinan Alfonso de Albuquerque?", options: ["1511", "1400", "1641", "1786"], correct: 0, hint: "Abad ke-16 awal, iaitu tepatnya pada tahun 1511.", rationale: "Melaka tewas kepada serangan Portugis pada tahun 1511 akibat masalah dalaman dan kelemahan pertahanan." },
+            { question: "Selepas kejatuhan Melaka, pusat pemerintahan warisan Melaka telah diasaskan di negeri manakah?", options: ["Johor", "Perlis", "Kelantan", "Sabah"], correct: 0, hint: "Sultan Mahmud Shah dan keturunannya membina pusat pemerintahan baru di selatan semenanjung.", rationale: "Kesultanan Johor Riau diasaskan oleh waris Kesultanan Melayu Melaka bagi meneruskan kelangsungan kerajaan." },
+            { question: "Apakah nama karya sastera agung yang dikarang oleh Tun Sri Lanang semasa era Kesultanan Johor Riau?", options: ["Sulalatus Salatin (Sejarah Melayu)", "Tuhfat al-Nafis", "Hikayat Hang Tuah", "Taj al-Salatin"], correct: 0, hint: "Kitab ini merakamkan susur galur salasilah Raja-raja Melaka.", rationale: "Sulalatus Salatin atau Sejarah Melayu merupakan karya agung persuratan Melayu yang diselenggara oleh Tun Sri Lanang atas titah Sultan Abdullah Ma'ayat Shah." },
+            { question: "Apakah matlamat utama 'Perang Tiga Segi' yang melibatkan Johor, Acheh, dan Portugis?", options: ["Menguasai perdagangan dan monopoli rempah ratus di Selat Melaka", "Berebut jajahan takluk di Kepulauan Borneo", "Mencari kawasan perlombongan bijih timah baru", "Menyebarkan agama Kristian di rantau Nusantara"], correct: 0, hint: "Perebutan penguasaan laluan air yang strategik.", rationale: "Perang Tiga Segi berlaku kerana persaingan hebat untuk menguasai Selat Melaka dan pelabuhan perdagangan penting." },
+            { question: "Bagaimanakah Kesultanan Perak diasaskan pada abad ke-16?", options: ["Atas jemputan pembesar Perak yang meminta putera Sultan Mahmud Shah ditabalkan sebagai Sultan Perak", "Melalui penaklukan ketenteraan oleh tentera Siam", "Dibuka oleh pelombong dari China", "Dibentuk selepas perpecahan Kesultanan Kedah"], correct: 0, hint: "Raja Muzaffar Shah dijemput untuk menjadi pemerintah.", rationale: "Kesultanan Perak diasaskan oleh Raja Muzaffar Shah atas jemputan pembesar Perak setelah mendapat restu daripada Sultan Mahmud Shah." },
+            { question: "Siapakah pengasas kepada Kesultanan Selangor moden yang berasal daripada keturunan Bugis?", options: ["Raja Lumu (Sultan Salehuddin Shah)", "Tun Zainal Abidin", "Long Yunus", "Syed Hussin Jamalullail"], correct: 0, hint: "Baginda ditabalkan dengan gelaran Sultan Salehuddin Shah.", rationale: "Raja Lumu daripada keturunan Bugis telah ditabalkan sebagai Sultan Selangor pertama dengan gelaran Sultan Salehuddin Shah." },
+            { question: "Kesultanan Terengganu diasaskan pada awal abad ke-18 oleh siapa?", options: ["Tun Zainal Abidin (putera Bendahara Paduka Raja Johor)", "Sultan Mansur Shah", "Raja Melewar", "Long Gaffar"], correct: 0, hint: "Baginda mempunyai pertalian darah dengan pembesar Kesultanan Johor Riau.", rationale: "Kesultanan Terengganu diasaskan oleh Tun Zainal Abidin pada tahun 1708 dengan restu Sultan Johor Riau." },
+            { question: "Apakah kepentingan Lembah Bujang kepada sejarah Kesultanan Kedah awal?", options: ["Sebagai pusat perdagangan antarabangsa dan pusat keagamaan Hindu-Buddha terawal", "Sebagai tempat perlindungan utama Sultan Melaka", "Sebagai kawasan perlombongan emas terbesar di Tanah Melayu", "Sebagai kubu pertahanan menentang British"], correct: 0, hint: "Kawasan penemuan candi purba di Kedah.", rationale: "Lembah Bujang terkenal sebagai pusat pelabuhan entrepot purba dan pusat penyebaran agama Hindu-Buddha." },
+            { question: "Bagaimanakah sistem pemerintahan di Negeri Sembilan unik berbanding negeri lain?", options: ["Mengamalkan pemilihan pemimpin (Yang di-Pertuan Besar) melalui permuafakatan Undang", "Pemerintahan mutlak tanpa penglibatan luak", "Mengamalkan sistem pewarisan takhta bapa kepada anak lelaki sulung", "Diterajui sepenuhnya oleh Gabenor British"], correct: 0, hint: "Empat Luak dan Undang memainkan peranan penting dalam pelantikan.", rationale: "Negeri Sembilan unik kerana mengamalkan Adat Perpatih dan memilih Yang di-Pertuan Besar melalui muafakat Undang." },
+            { question: "Siapakah tokoh yang menyatukan wilayah-wilayah kecil di Kelantan pada abad ke-18?", options: ["Long Yunus", "Long Gaffar", "Syed Hussin", "Raja Melewar"], correct: 0, hint: "Baginda menjadikan Kota Bharu sebagai pusat pentadbiran utamanya.", rationale: "Long Yunus berjaya menyatukan wilayah Kelantan dan membina pusat pentadbiran di Kota Bharu." },
+            { question: "Negeri Perlis pada awalnya merupakan sebahagian daripada wilayah takluk negeri manakala?", options: ["Kedah", "Perak", "Pahang", "Johor"], correct: 0, hint: "Terletak di sebelah utara Semenanjung bersempadan dengan Thailand.", rationale: "Perlis dahulunya sebahagian daripada wilayah Kedah sebelum dipecahkan dan ditadbir oleh keluarga Syed Hussin Jamalullail." },
+            { question: "Apakah ancaman luar utama yang dihadapi oleh Kedah pada akhir abad ke-18 dan awal abad ke-19?", options: ["Ancaman kuasa Siam", "Serangan tentera Sepanyol", "Penjajahan Belanda sepenuhnya", "Serangan tentera Majapahit"], correct: 0, hint: "Negara jiran di sebelah utara Semenanjung.", rationale: "Kedah menghadapi tekanan dan ancaman politik serta ketenteraan daripada pihak Siam di utara." },
+            { question: "Apakah peranan penting 'Adat Perpatih' dalam kalangan masyarakat Negeri Sembilan?", options: ["Menitikberatkan perpaduan sukunya dan pemilikan harta pusaka melalui susur galur ibu", "Menggalakkan pemusatan kuasa mutlak pada tangan seorang raja", "Menetapkan hukuman denda yang sama rata tanpa mengira suku", "Mengharamkan sebarang aktiviti pertanian di tanah adat"], correct: 0, hint: "Berkaitan harta pusaka pesaka dan amalan bersaudara dalam suku.", rationale: "Adat Perpatih menitikberatkan ikatan persaudaraan yang erat serta pemilikan harta pusaka diwarisi melalui garis keturunan ibu." }
+        ];
+
+        let state = {
+            username: "",
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            userAnswers: [],
+            startTime: null,
+            timerInterval: null,
+            elapsedSeconds: 0
+        };
+
+        const screenRegister = document.getElementById('screen-register');
+        const screenQuiz = document.getElementById('screen-quiz');
+        const screenResult = document.getElementById('screen-result');
+        const screenReview = document.getElementById('screen-review');
+        const screenLeaderboard = document.getElementById('screen-leaderboard');
+
+        const formRegister = document.getElementById('form-register');
+        const usernameInput = document.getElementById('username');
+        const questionTracker = document.getElementById('question-tracker');
+        const progressBar = document.getElementById('progress-bar');
+        const timerDisplay = document.getElementById('timer-display');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const btnHint = document.getElementById('btn-hint');
+        const btnNext = document.getElementById('btn-next');
+        const hintBox = document.getElementById('hint-box');
+        
+        const finalScore = document.getElementById('final-score');
+        const resultUserInfo = document.getElementById('result-user-info');
+        const resultRemark = document.getElementById('result-remark');
+        const btnReview = document.getElementById('btn-review');
+        const btnLeaderboardView = document.getElementById('btn-leaderboard-view');
+        
+        const reviewContainer = document.getElementById('review-container');
+        const btnBackToResult = document.getElementById('btn-back-to-result');
+        const fullLeaderboardList = document.getElementById('full-leaderboard-list');
+        const btnCloseLeaderboard = document.getElementById('btn-close-leaderboard');
+        const btnRestart = document.getElementById('btn-restart');
+        const miniLeaderboard = document.getElementById('mini-leaderboard');
+
+        // Leaderboard dikosongkan permulaannya (tiada data dummy, senarai bersih)
+        function getLeaderboard() {
+            try {
+                let data = localStorage.getItem('sejarah_t2_leaderboard_green_v1');
+                return data ? JSON.parse(data) : [];
+            } catch(e) { return []; }
+        }
+
+        function saveLeaderboard(lb) {
+            try {
+                localStorage.setItem('sejarah_t2_leaderboard_green_v1', JSON.stringify(lb));
+            } catch(e) {}
+        }
+
+        function renderMiniLeaderboard() {
+            let lb = getLeaderboard().sort((a,b) => b.score - a.score || a.time.localeCompare(b.time));
+            miniLeaderboard.innerHTML = "";
+            if(lb.length === 0) {
+                miniLeaderboard.innerHTML = `<p class="italic text-slate-500 text-center py-2">Belum ada rekod. Jadilah yang pertama! 🏆</p>`;
+                return;
+            }
+            lb.slice(0, 3).forEach((item, index) => {
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-slate-950/60 px-3 py-2 rounded-xl border border-slate-800/60";
+                div.innerHTML = `<span class="text-slate-300"><strong>#${index+1}</strong> ${escapeHtml(item.name)}</span> <span class="font-bold text-emerald-400">${item.score}/20</span>`;
+                miniLeaderboard.appendChild(div);
+            });
+        }
+
+        renderMiniLeaderboard();
+
+        formRegister.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let name = usernameInput.value.trim();
+            if(!name) return;
+            state.username = name;
+            startQuiz();
+        });
+
+        function startQuiz() {
+            let shuffled = [...masterQuestionPool].sort(() => 0.5 - Math.random());
+            state.questions = shuffled.slice(0, 20);
+            state.currentIndex = 0;
+            state.score = 0;
+            state.userAnswers = [];
+            state.elapsedSeconds = 0;
+
+            screenRegister.classList.add('hidden');
+            screenResult.classList.add('hidden');
+            screenQuiz.classList.remove('hidden');
+
+            state.startTime = Date.now();
+            if(state.timerInterval) clearInterval(state.timerInterval);
+            state.timerInterval = setInterval(updateTimer, 1000);
+
+            loadQuestion();
+        }
+
+        function updateTimer() {
+            state.elapsedSeconds++;
+            let mins = Math.floor(state.elapsedSeconds / 60).toString().padStart(2, '0');
+            let secs = (state.elapsedSeconds % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `${mins}:${secs}`;
+        }
+
+        function loadQuestion() {
+            let q = state.questions[state.currentIndex];
+            questionTracker.textContent = `Soalan ${state.currentIndex + 1} / 20`;
+            progressBar.style.width = `${((state.currentIndex + 1) / 20) * 100}%`;
+            
+            questionText.textContent = q.question;
+            hintBox.classList.add('hidden');
+            hintBox.textContent = q.hint;
+            btnNext.classList.add('hidden');
+
+            let optionPairs = q.options.map((opt, idx) => ({ text: opt, originalIndex: idx }));
+            optionPairs.sort(() => 0.5 - Math.random());
+
+            optionsContainer.innerHTML = '';
+            optionPairs.forEach((pair) => {
+                let btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-2xl bg-slate-950/60 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-800/50 transition-all font-medium text-slate-200 text-xs sm:text-sm flex items-center justify-between group";
+                btn.innerHTML = `<span>${escapeHtml(pair.text)}</span> <span class="w-4 h-4 rounded-full border border-slate-700 flex items-center justify-center text-[10px] text-transparent group-hover:border-emerald-400">●</span>`;
+                btn.onclick = () => selectAnswer(pair.originalIndex, q.correct, btn, optionPairs);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        btnHint.onclick = () => hintBox.classList.toggle('hidden');
+
+        function selectAnswer(selectedIndex, correctIndex, selectedBtn, optionPairs) {
+            let buttons = optionsContainer.querySelectorAll('button');
+            buttons.forEach(b => b.disabled = true);
+
+            let isCorrect = (selectedIndex === correctIndex);
+            if(isCorrect) {
+                state.score++;
+                selectedBtn.className = "w-full text-left p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/50 text-emerald-200 transition-all font-medium text-xs sm:text-sm flex items-center justify-between";
+                selectedBtn.innerHTML += `<span class="text-emerald-400 font-bold">✔</span>`;
+            } else {
+                selectedBtn.className = "w-full text-left p-4 rounded-2xl bg-rose-500/10 border border-rose-500/50 text-rose-200 transition-all font-medium text-xs sm:text-sm flex items-center justify-between";
+                selectedBtn.innerHTML += `<span class="text-rose-400 font-bold">✘</span>`;
+                buttons.forEach(b => {
+                    if(b.textContent.includes(state.questions[state.currentIndex].options[correctIndex])) {
+                        b.className = "w-full text-left p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/50 text-emerald-200 transition-all font-medium text-xs sm:text-sm flex items-center justify-between";
+                    }
+                });
+            }
+
+            state.userAnswers.push({
+                question: state.questions[state.currentIndex].question,
+                options: state.questions[state.currentIndex].options,
+                userAnswerIndex: selectedIndex,
+                correctAnswerIndex: correctIndex,
+                isCorrect: isCorrect,
+                rationale: state.questions[state.currentIndex].rationale
+            });
+
+            btnNext.classList.remove('hidden');
+        }
+
+        btnNext.onclick = () => {
+            state.currentIndex++;
+            if(state.currentIndex < state.questions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        };
+
+        function finishQuiz() {
+            clearInterval(state.timerInterval);
+            screenQuiz.classList.add('hidden');
+            screenResult.classList.remove('hidden');
+
+            let mins = Math.floor(state.elapsedSeconds / 60);
+            let secs = state.elapsedSeconds % 60;
+            let timeStr = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+
+            finalScore.textContent = `${state.score} / 20`;
+            resultUserInfo.textContent = `Hebat, ${escapeHtml(state.username)}! Masa: ${timeStr}`;
+
+            let percentage = (state.score / 20) * 100;
+            if(percentage >= 80) {
+                resultRemark.textContent = "🌟 Pencapaian Cemerlang! Anda pakar Sejarah Tingkatan 2.";
+            } else if(percentage >= 50) {
+                resultRemark.textContent = "👍 Keputusan yang baik! Teruskan usaha cemerlang.";
+            } else {
+                resultRemark.textContent = "💪 Jangan risau, semak semula nota pembetulan di bawah.";
+            }
+
+            let lb = getLeaderboard();
+            lb.push({
+                name: state.username,
+                score: state.score,
+                time: timeStr,
+                date: new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' })
+            });
+            saveLeaderboard(lb);
+            renderMiniLeaderboard();
+        }
+
+        btnReview.onclick = () => {
+            screenResult.classList.add('hidden');
+            screenReview.classList.remove('hidden');
+            renderReviewList();
+        };
+
+        btnBackToResult.onclick = () => {
+            screenReview.classList.add('hidden');
+            screenResult.classList.remove('hidden');
+        };
+
+        function renderReviewList() {
+            reviewContainer.innerHTML = '';
+            state.userAnswers.forEach((item, index) => {
+                let div = document.createElement('div');
+                div.className = `p-3.5 rounded-2xl border ${item.isCorrect ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-rose-500/20 bg-rose-500/5'}`;
+                
+                let userAnsText = item.options[item.userAnswerIndex];
+                let correctAnsText = item.options[item.correctAnswerIndex];
+
+                div.innerHTML = `
+                    <p class="text-[10px] font-bold text-slate-400 mb-1">Soalan ${index + 1}</p>
+                    <p class="font-semibold text-white text-xs sm:text-sm mb-2">${escapeHtml(item.question)}</p>
+                    <div class="text-[11px] space-y-1 mb-2">
+                        <p class="${item.isCorrect ? 'text-emerald-400' : 'text-rose-400'}"><strong>Jawapan Anda:</strong> ${escapeHtml(userAnsText)}</p>
+                        ${!item.isCorrect ? `<p class="text-emerald-400"><strong>Jawapan Betul:</strong> ${escapeHtml(correctAnsText)}</p>` : ''}
+                    </div>
+                    <div class="text-[11px] bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80 text-slate-300">
+                        <strong class="text-emerald-400">Nota Pembetulan:</strong> ${escapeHtml(item.rationale)}
+                    </div>
+                `;
+                reviewContainer.appendChild(div);
+            });
+        }
+
+        btnLeaderboardView.onclick = () => {
+            screenResult.classList.add('hidden');
+            screenLeaderboard.classList.remove('hidden');
+            renderFullLeaderboard();
+        };
+
+        btnCloseLeaderboard.onclick = () => {
+            screenLeaderboard.classList.add('hidden');
+            screenResult.classList.add('hidden');
+            screenRegister.classList.remove('hidden');
+            usernameInput.value = '';
+            renderMiniLeaderboard();
+        };
+
+        btnRestart.onclick = () => {
+            screenLeaderboard.classList.add('hidden');
+            screenRegister.classList.remove('hidden');
+            usernameInput.value = '';
+            renderMiniLeaderboard();
+        };
+
+        function renderFullLeaderboard() {
+            let lb = getLeaderboard().sort((a,b) => b.score - a.score || a.time.localeCompare(b.time));
+            fullLeaderboardList.innerHTML = '';
+            if(lb.length === 0) {
+                fullLeaderboardList.innerHTML = `<p class="text-center text-slate-500 italic text-xs py-4">Tiada rekod tersimpan lagi.</p>`;
+                return;
+            }
+            lb.forEach((item, index) => {
+                let row = document.createElement('div');
+                row.className = `flex justify-between items-center p-3 rounded-2xl border ${item.name === state.username && item.score === state.score ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-slate-950/60 border-slate-800'}`;
+                row.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 text-center text-xs font-bold text-emerald-400">#${index+1}</span>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-200">${escapeHtml(item.name)}</p>
+                            <p class="text-[9px] text-slate-500">${item.date || 'Hari ini'}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-white">${item.score} / 20</span>
+                        <p class="text-[9px] text-slate-400 font-mono">${item.time}</p>
+                    </div>
+                `;
+                fullLeaderboardList.appendChild(row);
+            });
+        }
+
+        function escapeHtml(text) {
+            let map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
